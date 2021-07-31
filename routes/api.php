@@ -34,7 +34,11 @@ use App\Http\Middleware\ApiAuthMiddleware;
 
 Route::get('validar',[UserController::class,'validar']);
 Route::post('login', [UserController::class,'authenticate']);
-Route::post('/verificar', [PatientsController::class, 'verificar']);
+Route::post('token', [UserController::class,'getAuthenticatedUser']);
+
+Route::post('google', [UserController::class,'loginGoogle']);
+
+Route::post('verificar', [PatientsController::class, 'verificar']);
 
 
 Route::get('hospitals/count',[HospitalsController::class,'HospitalsCount']);

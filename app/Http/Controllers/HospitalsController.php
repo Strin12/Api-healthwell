@@ -20,7 +20,6 @@ class HospitalsController extends Controller
     public function __construct(HospitalsRepository $repository)
     {
         $this->hospitals_respository = $repository;
-
     }
 
     public function create(Request $request)
@@ -30,20 +29,20 @@ class HospitalsController extends Controller
             'direction' => 'required|string|max:50',
         ]);
         if ($validator->fails()) {
-            Log::warning('HospitalsController','create','Falta un campo por llenar');
+            Log::warning('HospitalsController', 'create', 'Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
-        try{
-        $uuid = Uuid::generate()->string;
-        $name = $request->input('name');
-        $direction = $request->input('direction');
-        $photo = $request->input('photo');
-        Log::info('HospitalsController - create - Se creo un nuevo hospital');
-        return response()->json($this->hospitals_respository->create($uuid, $name, $direction, $photo));
+        try {
+            $uuid = Uuid::generate()->string;
+            $name = $request->input('name');
+            $direction = $request->input('direction');
+            $photo = $request->input('photo');
+            Log::info('HospitalsController - create - Se creo un nuevo hospital');
+            return response()->json($this->hospitals_respository->create($uuid, $name, $direction, $photo));
         } catch (\Exception $ex) {
-            Log::emergency('HospitalsController','create','Ocurrio un error al crear un nuevo hospital');
+            Log::emergency('HospitalsController', 'create', 'Ocurrio un error al crear un nuevo hospital');
             return response()->json(['error' => $ex->getMessage()]);
-            }
+        }
     }
 
     public function updated(Request $request, $uuid)
@@ -53,32 +52,33 @@ class HospitalsController extends Controller
             'direction' => 'required|string|max:50',
         ]);
         if ($validator->fails()) {
-            Log::warning('HospitalsController','updated','Falta un campo por llenar');
+            Log::warning('HospitalsController', 'updated', 'Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
-        try{
-        $name = $request->input('name');
-        $direction = $request->input('direction');
-        $photo = $request->input('photo');
-        Log::info('HospitalsController - updated - Se actualizo un hospital con el uuid'.$this->hospitals_respository->find($uuid));
-        return response()->json($this->hospitals_respository->updated($uuid, $name, $direction, $photo));
-        } catch(\Exception $ex){
-            Log::emergency('HospitalsController','updated','Ocurrio un error al actualizar un hospital');
+        try {
+            $name = $request->input('name');
+            $direction = $request->input('direction');
+            $photo = $request->input('photo');
+            Log::info('HospitalsController - updated - Se actualizo un hospital con el uuid' . $this->hospitals_respository->find($uuid));
+            return response()->json($this->hospitals_respository->updated($uuid, $name, $direction, $photo));
+        } catch (\Exception $ex) {
+            Log::emergency('HospitalsController', 'updated', 'Ocurrio un error al actualizar un hospital');
             return response()->json(['error' => $ex->getMessage()]);
-            }
+        }
     }
 
     public function delete($uuid)
     {
-        try{
-        Log::info('HospitalsController - delete - se ha eliminado un hospital');
-        return response()->json($this->hospitals_respository->delete($uuid));
-        } catch(\Exception $ex){
-            Log::emergency('HospitalsController','delete','Ocurrio un error al eliminar un hospital');
+        try {
+            Log::info('HospitalsController - delete - se ha eliminado un hospital');
+            return response()->json($this->hospitals_respository->delete($uuid));
+        } catch (\Exception $ex) {
+            Log::emergency('HospitalsController', 'delete', 'Ocurrio un error al eliminar un hospital');
             return response()->json(['error' => $ex->getMessage()]);
-            }
+        }
     }
-    function list() {
+    function list()
+    {
         return response()->json($this->hospitals_respository->list());
     }
 
@@ -87,7 +87,8 @@ class HospitalsController extends Controller
         return response()->json($this->hospitals_respository->find($uuid));
     }
 
-    public function HospitalsCount(){
+    public function HospitalsCount()
+    {
         return response()->json($this->hospitals_respository->HospitalsCount());
     }
 
@@ -100,9 +101,7 @@ class HospitalsController extends Controller
             return new Response($file, 201);
         } else {
             return response()->json('No existe la imagen');
-
         }
-
     }
 
     public function upload(Request $request)
@@ -115,7 +114,7 @@ class HospitalsController extends Controller
 
         ]);
         if ($validator->fails()) {
-            Log::warning('HospitalsController','upload','Verifique el formato de la imagen');
+            Log::warning('HospitalsController', 'upload', 'Verifique el formato de la imagen');
             return response()->json($validator->errors()->toJson(), 400);
         }
 

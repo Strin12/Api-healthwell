@@ -27,19 +27,19 @@ class UserController extends Controller
     protected $users_repository;
     protected $persons_repository;
 
-    public function __construct(UsersRepository $_users, PersonsRepository $_persons) {
+    public function __construct(UsersRepository $_users, PersonsRepository $_persons)
+    {
         $this->users_repository = $_users;
         $this->persons_repository = $_persons;
-
     }
 
     public function authenticate(Request $request)
     {
         $credentials = $request->only('email', 'password');
         try {
-                if (!$token = JWTAuth::attempt($credentials)) {
-                    return response()->json(['error' => 'invalid_credentials'], 400);
-                }
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'invalid_credentials'], 400);
+            }
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
@@ -47,13 +47,32 @@ class UserController extends Controller
         $persons = $users->persons;
         $roles = $users->roles;
 
-        if($users->validation != ''){
-            Log::warning('UserController - authenticate - el usuario no fue validado'.$users);
+        if ($users->validation != '') {
+            Log::warning('UserController - authenticate - el usuario no fue validado' . $users);
             return response()->json('Porfavor valide su usuario para logearse');
         }
-        Log::info('UserController - authenticate - Se a inicado sesión'.$users);
-       
+        Log::info('UserController - authenticate - Se a inicado sesión' . $users);
 
+
+        return response()->json(compact('token', 'users'));
+    }
+
+    public function loginGoogle(Request $request)
+    {
+        $users = User::where('email', '=', $request->input('email'))->first();
+        try {
+            if ($users != null) {
+                $token = JWTAuth::fromUser($users);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'could_not_create_token'], 500);
+        }
+        $persons = $users->persons;
+        $roles = $users->roles;
+        if ($users->roles_id == User::PATIENTS) {
+            Log::warning('UserController - loginGoogle - Un usuario con rol diferente quiso acceder a la aplicacion' . $users);
+            return response()->json(['error' => 'user_does_not_have permissions'], 403);
+        }
         return response()->json(compact('token', 'users'));
     }
 
@@ -63,14 +82,15 @@ class UserController extends Controller
             if (!$user = JWTAuth::parseToken()->authenticate()) {
                 return response()->json(['user_not_found'], 404);
             }
-        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException$e) {
+        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json(['token_expired'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException$e) {
+        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
             return response()->json(['token_invalid'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\JWTException$e) {
+        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
             return response()->json(['token_absent'], $e->getStatusCode());
         }
-        $rol = User::where('roles_id', '=', $user->roles->roles_id)->first();
+        $persons = $user->persons;
+        $roles = $user->roles;
         return response()->json(compact('user'));
     }
 
@@ -86,48 +106,59 @@ class UserController extends Controller
             'telefone' => 'required|string|max:10',
             'email' => 'required|string|unique:users|max:50',
             'password' => 'required|min:6',
-           
+
         ]);
         if ($validator->fails()) {
-         //    Log::warning('UserController','create','Falta un campo por llenar');
+            //    Log::warning('UserController','create','Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
-            try{
-            $person = $this->persons_repository->create(Uuid::generate()->string, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'), $request->get('curp'), $request->get('cell_phone'),
-            $request->get('telefone'), 'default.jpg');
+        try {
+            $person = $this->persons_repository->create(
+                Uuid::generate()->string,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('curp'),
+                $request->get('cell_phone'),
+                $request->get('telefone'),
+                'default.jpg'
+            );
 
-            $user = $this->users_repository->create(Uuid::generate()->string, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'), $request->get('email'), Hash::make($request->get('password')),
-            $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
-            $person->id,User::ADMIN);
+            $user = $this->users_repository->create(
+                Uuid::generate()->string,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('email'),
+                Hash::make($request->get('password')),
+                $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
+                $person->id,
+                User::ADMIN
+            );
 
             $token = JWTAuth::fromUser($user);
             $this->sendEmail($user);
 
             Log::info('UserController - create - Se creo un nuevo usuario');
             return response()->json(compact('user', 'token', 'person'), 201);
-        }catch (\Exception $ex){
-        //  Log::emergency('UserController','create','Ocurrio un error al crear un nuevo usuario');
-        return response()->json(['error' => $ex->getMessage()]);
-        
+        } catch (\Exception $ex) {
+            //  Log::emergency('UserController','create','Ocurrio un error al crear un nuevo usuario');
+            return response()->json(['error' => $ex->getMessage()]);
+        }
     }
-        
-       
-    
-    }
-    function list() {
+    function list()
+    {
         $persons = User::where('roles_id', '=', 1)->get();
         $admins = [];
-        foreach($persons as $key => $value){
+        foreach ($persons as $key => $value) {
             $admins[$key] = [
-                'id'=>$value['id'],
-                'uuid'=>$value['uuid'],
-                'name'=>$value['name'],
-                'email'=>$value['email'],
-                'validation'=>$value['validation'],
-                'name'=>$value->roles->name,
-                'photo'=>$value->persons->photo,
+                'id' => $value['id'],
+                'uuid' => $value['uuid'],
+                'name' => $value['name'],
+                'email' => $value['email'],
+                'validation' => $value['validation'],
+                'name' => $value->roles->name,
+                'photo' => $value->persons->photo,
 
             ];
         }
@@ -136,16 +167,16 @@ class UserController extends Controller
 
     public function delete($uuid)
     {
-        try{
-        $user = User::where('uuid', '=', $uuid)->first();
-        $user->persons->delete();
-        $user->delete();
+        try {
+            $user = User::where('uuid', '=', $uuid)->first();
+            $user->persons->delete();
+            $user->delete();
 
-        Log::info('UserController - delete - Se ha eliminado un usuario');
-        return response()->json('Datos eliminados');
-    } catch(\Exception $ex){
-        Log::emergency('UserController','delete','Ocurrio un error al eliminar un usuario');
-        return response()->json(['error' => $ex->getMessage()]);
+            Log::info('UserController - delete - Se ha eliminado un usuario');
+            return response()->json('Datos eliminados');
+        } catch (\Exception $ex) {
+            Log::emergency('UserController', 'delete', 'Ocurrio un error al eliminar un usuario');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
 
@@ -164,24 +195,34 @@ class UserController extends Controller
             // Log::warning('UserController','updated','Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
-        try{
-        $user2 = User::where('uuid', '=', $uuid)->first();
+        try {
+            $user2 = User::where('uuid', '=', $uuid)->first();
 
-        $person = $this->persons_repository->update($user2->persons->uuid, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'), $request->get('curp'), $request->get('cell_phone'),
-            $request->get('telefone'), $request->get('photo'));
+            $person = $this->persons_repository->update(
+                $user2->persons->uuid,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('curp'),
+                $request->get('cell_phone'),
+                $request->get('telefone'),
+                $request->get('photo')
+            );
 
-        $user = $this->users_repository->update($user2->uuid, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'));
-        
+            $user = $this->users_repository->update(
+                $user2->uuid,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern')
+            );
 
-            Log::info('UserController - updated - Se actualizo el usuario con el uuid'.$this->domicile_respository->find($uuid));
+
+            Log::info('UserController - updated - Se actualizo el usuario con el uuid' . $this->domicile_respository->find($uuid));
             return response()->json(compact('user', 'person', 'doctors'), 201);
-        } catch(\Exception $ex){
-            Log::emergency('UserController','updated','Ocurrio un error al actualizar un usuario');
+        } catch (\Exception $ex) {
+            Log::emergency('UserController', 'updated', 'Ocurrio un error al actualizar un usuario');
             return response()->json(['error' => $ex->getMessage()]);
         }
-
     }
     public function validar(Request $request)
     {
@@ -230,9 +271,7 @@ class UserController extends Controller
             return new Response($file, 201);
         } else {
             return response()->json('No existe la imagen');
-
         }
-
     }
 
     public function upload(Request $request)
@@ -258,7 +297,8 @@ class UserController extends Controller
 
         return response()->json($data, $data['code']);
     }
-    public function sendEmail($user ){
+    public function sendEmail($user)
+    {
         $datas['subject'] = 'HealthWell';
         $datas['for'] = $user['email'];
         Mail::send('mail.mail', ['user' => $user], function ($msj) use ($datas) {

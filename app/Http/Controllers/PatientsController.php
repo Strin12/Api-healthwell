@@ -214,24 +214,13 @@ class PatientsController extends Controller
     {
 
         $person = Persons::where('uuid', '=', $uuid)->first();
-      //  $user = User::where('uuid', '=', $person->users->uuid)->first();
-       // $rol = Roles::where('uuid', '=', $user->roles->uuid)->first();
-        //$patients = Patients::where('uuid', '=', $person->patients->uuid)->first();
-        // $inquiries = inquiries::where('uuid', '=', $patients->inquiries->uuid)->first();
+        $user = User::where('uuid', '=', $person->users->uuid)->first();
+       $rol = Roles::where('uuid', '=', $user->roles->uuid)->first();
+        $patients = Patients::where('uuid', '=', $person->patients->uuid)->first();
 
         $masvar = [
             'id' => $person['id'],
-            'uuid' => $person->users->uuid,
-            'person' => $person->name,
-            'ap_patern' => $person->ap_patern,
-            'ap_matern' => $person->ap_matern,
-            'curp' => $person->curp,
-            'cell_phone' => $person->cell_phone,
-            'telefone' => $person->telefone,
-            'photo' => $person->photo,
-            'roles_id' => $person->users->roles_id,
-            'rol' => $person->users->roles->name,
-           /* 'uuid' => $user['uuid'],
+            'uuid' => $user['uuid'],
             'person' => $person['name'],
             'ap_patern' => $person['ap_patern'],
             'ap_matern' => $person['ap_matern'],
@@ -250,11 +239,8 @@ class PatientsController extends Controller
             'religion' => $patients['religion'],
             'socioeconomic_level' => $patients['socioeconomic_level'],
             'age' => $patients['age'],
-            'hospitals_id' => $patients['hospitals_id'],*/
-            // 'patients_id' => $inquiries['patients_id'],
-            // 'inquiries_id' => $inquiries['id'],
-
-        //    'rol' => $rol['name'],
+            'hospitals_id' => $patients['hospitals_id'],
+            'rol' => $rol['name'],
         ];
 
         return response()->json($masvar);
