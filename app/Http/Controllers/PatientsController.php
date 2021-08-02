@@ -39,29 +39,29 @@ class PatientsController extends Controller
     public function verificar(Request $request)
     {
         $usr = User::where('email', '=', $request->input('email'))->first();
-        
-        if($usr != null){
+
+        if ($usr != null) {
             $credentials = $request->only('email', 'password');
-        try {
+            try {
                 if (!$token = JWTAuth::attempt($credentials)) {
                     return response()->json(['error' => 'invalid_credentials'], 400);
                 }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'could_not_create_token'], 500);
-        }
-        $users = JWTAuth::user();
-        $persons = $users->persons;
-        $roles = $users->roles;
-        
-        if($users->roles_id == 1 &&  $users->roles_id == 2 ){
-            Log::warning('PatientsController - verificar - Un usuario con rol diferente quiso acceder a la aplicacion'.$users);
-            return response()->json('Este usuario no tiene permisos para acceder');
-        }
-        Log::info('UserController - authenticate - Se a inicado sesión'.$users);
-       
+            } catch (JWTException $e) {
+                return response()->json(['error' => 'could_not_create_token'], 500);
+            }
+            $users = JWTAuth::user();
+            $persons = $users->persons;
+            $roles = $users->roles;
 
-        return response()->json(compact('token', 'users'));
-        }else{
+            if ($users->roles_id == 1 &&  $users->roles_id == 2) {
+                Log::warning('PatientsController - verificar - Un usuario con rol diferente quiso acceder a la aplicacion' . $users);
+                return response()->json('Este usuario no tiene permisos para acceder');
+            }
+            Log::info('UserController - authenticate - Se a inicado sesión' . $users);
+
+
+            return response()->json(compact('token', 'users'));
+        } else {
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:50',
                 'ap_patern' => 'required|string|max:50',
@@ -76,37 +76,58 @@ class PatientsController extends Controller
                 'religion' => 'required|string|max:50',
                 'socioeconomic_level' => 'required|string|max:50',
                 'age' => 'required|integer',
-    
+
             ]);
             if ($validator->fails()) {
-            //     Log::warning('PatientsController','verificar','Falta un campo por llenar');
+                //     Log::warning('PatientsController','verificar','Falta un campo por llenar');
                 return response()->json($validator->errors()->toJson(), 400);
             }
-            try{
-            $person = $this->persons_repository->create(Uuid::generate()->string, $request->get('name'), $request->get('ap_patern'),
-                $request->get('ap_matern'), $request->get('curp'), $request->get('cell_phone'),
-                $request->get('telefone'), 'default.jpg');
-    
-                $user = $this->users_repository->create(Uuid::generate()->string, $request->get('name'), $request->get('ap_patern'),
-                $request->get('ap_matern'), $request->get('email'), Hash::make($request->get('password')),
-                $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
-                $person->_id, User::PATIENTS);
-    
-                $patients = $this->patients_respository->create(Uuid::generate()->string, $request->get('living_place'), $request->get('blood_type'),
-                $request->get('disability'),$request->get('religion'), $request->get('socioeconomic_level'),
-                $request->get('age'), $request->get('hospitals_id'), $person->_id);
-                
+            try {
+                $person = $this->persons_repository->create(
+                    Uuid::generate()->string,
+                    $request->get('name'),
+                    $request->get('ap_patern'),
+                    $request->get('ap_matern'),
+                    $request->get('curp'),
+                    $request->get('cell_phone'),
+                    $request->get('telefone'),
+                    'default.jpg'
+                );
+
+                $user = $this->users_repository->create(
+                    Uuid::generate()->string,
+                    $request->get('name'),
+                    $request->get('ap_patern'),
+                    $request->get('ap_matern'),
+                    $request->get('email'),
+                    Hash::make($request->get('password')),
+                    $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
+                    $person->_id,
+                    User::PATIENTS
+                );
+
+                $patients = $this->patients_respository->create(
+                    Uuid::generate()->string,
+                    $request->get('living_place'),
+                    $request->get('blood_type'),
+                    $request->get('disability'),
+                    $request->get('religion'),
+                    $request->get('socioeconomic_level'),
+                    $request->get('age'),
+                    $request->get('hospitals_id'),
+                    $person->_id
+                );
+
                 $token = JWTAuth::fromUser($user);
-    
-            return response()->json(compact('user', 'token', 'person', 'patients'), 201);
-        } catch (\Exception $ex) {
-            Log::emergency('PatientsController','verificar','Ocurrio un error al intentar crear un nuevo paciente');
-            return response()->json(['error' => $ex->getMessage()]);
+
+                return response()->json(compact('user', 'token', 'person', 'patients'), 201);
+            } catch (\Exception $ex) {
+                Log::emergency('PatientsController', 'verificar', 'Ocurrio un error al intentar crear un nuevo paciente');
+                return response()->json(['error' => $ex->getMessage()]);
             }
-            
         }
     }
-   
+
 
     public function updated(Request $request, $uuid)
     {
@@ -127,95 +148,116 @@ class PatientsController extends Controller
 
         ]);
         if ($validator->fails()) {
-            Log::warning('PatientsController','create','Falta un campo por llenar');
+            Log::warning('PatientsController', 'create', 'Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
-        try{
-        $user2 = User::where('uuid', '=', $uuid)->first();
+        try {
+            $user2 = User::where('uuid', '=', $uuid)->first();
 
-        $patients = $this->patients_respository->update($user2->persons->patients->uuid, $request->get('living_place'), $request->get('blood_type'),
-            $request->get('disability'), $request->get('ethnic_group'), $request->get('religion'), $request->get('socioeconomic_level'),
-            $request->get('age'), $request->get('hospitals_id'));
+            $patients = $this->patients_respository->update(
+                $user2->persons->patients->uuid,
+                $request->get('living_place'),
+                $request->get('blood_type'),
+                $request->get('disability'),
+                $request->get('ethnic_group'),
+                $request->get('religion'),
+                $request->get('socioeconomic_level'),
+                $request->get('age'),
+                $request->get('hospitals_id')
+            );
 
-        $person = $this->persons_repository->update($user2->persons->uuid, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'), $request->get('curp'), $request->get('cell_phone'),
-            $request->get('telefone'), $request->get('photo'));
+            $person = $this->persons_repository->update(
+                $user2->persons->uuid,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('curp'),
+                $request->get('cell_phone'),
+                $request->get('telefone'),
+                $request->get('photo')
+            );
 
-        $user = $this->users_repository->update($user2->uuid, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'));
+            $user = $this->users_repository->update(
+                $user2->uuid,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern')
+            );
 
-        Log::info('PatientsController - updated - Se actualizo un paciente con el uuid'.$this->hospitals_respository->find($uuid));
-        return response()->json(compact('user', 'person', 'patients'), 201);
-        } catch(\Exception $ex){
-        Log::emergency('PatientsController','updated','Ocurrio un error al actualizar un paciente');
-        return response()->json(['error' => $ex->getMessage()]);
+            Log::info('PatientsController - updated - Se actualizo un paciente con el uuid' . $this->hospitals_respository->find($uuid));
+            return response()->json(compact('user', 'person', 'patients'), 201);
+        } catch (\Exception $ex) {
+            Log::emergency('PatientsController', 'updated', 'Ocurrio un error al actualizar un paciente');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
-    public function retornarPatients($uuid){
+    public function retornarPatients($uuid)
+    {
         $user = User::withTrashed()->where('uuid', $uuid)->first();
         $user = $user->persons_id;
-       $user_restore = User::withTrashed()->where('persons_id', $user)->restore();
-      $patients = Patients::withTrashed()->where('persons_id', $user)->restore();
-      $persons = Persons::withTrashed()->where('_id', $user)->restore();;     
-   
-       return response()->json('Usuario desbloqueado');
+        $user_restore = User::withTrashed()->where('persons_id', $user)->restore();
+        $patients = Patients::withTrashed()->where('persons_id', $user)->restore();
+        $persons = Persons::withTrashed()->where('_id', $user)->restore();;
+
+        return response()->json('Usuario desbloqueado');
     }
     public function delete($uuid)
     {
-        try{
-        $user = User::where('uuid', '=', $uuid)->first();
-        $user->persons->patients->delete();
-        $user->persons->delete();
-        $user->delete();
+        try {
+            $user = User::where('uuid', '=', $uuid)->first();
+            $user->persons->patients->delete();
+            $user->persons->delete();
+            $user->delete();
 
-        Log::info('PatientsController - delete - se ha eliminado un paciente');
-        return response()->json('Datos eliminados');
-        } catch(\Exception $ex){
-        Log::emergency('PatientsController','delete','Ocurrio un error al eliminar un paciente');
-        return response()->json(['error' => $ex->getMessage()]);
+            Log::info('PatientsController - delete - se ha eliminado un paciente');
+            return response()->json('Datos eliminados');
+        } catch (\Exception $ex) {
+            Log::emergency('PatientsController', 'delete', 'Ocurrio un error al eliminar un paciente');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
-    
-  public function list() {
+
+    public function list()
+    {
         $persons = User::where('roles_id', '=', 3)->get();
         $patients = [];
-        foreach($persons as $key => $value){
+        foreach ($persons as $key => $value) {
             $patients[$key] = [
-                '_id'=>$value['_id'],
-                'uuid'=>$value['uuid'],
-                'paciente'=>$value['name'],
-                'email'=>$value['email'],
-                'name'=>$value->roles->name,
-                'curp'=>$value->persons->curp,
-                'patients_id'=>$value->persons->patients->_id,
+                '_id' => $value['_id'],
+                'uuid' => $value['uuid'],
+                'paciente' => $value['name'],
+                'email' => $value['email'],
+                'name' => $value->roles->name,
+                'curp' => $value->persons->curp,
+                'patients_id' => $value->persons->patients->_id,
 
             ];
         }
         return response()->json($patients);
-    
     }
-    public function PatientsBloquers(){
+    public function PatientsBloquers()
+    {
         $persons = User::where('roles_id', '=', 3)->onlyTrashed()->get();
         $patients = [];
-        foreach($persons as $key => $value){
+        foreach ($persons as $key => $value) {
             $patients[$key] = [
-                '_id'=>$value['_id'],
-                'uuid'=>$value['uuid'],
-                'paciente'=>$value['name'],
-                'email'=>$value['email'],
-                'name'=>$value->roles->name,
+                '_id' => $value['_id'],
+                'uuid' => $value['uuid'],
+                'paciente' => $value['name'],
+                'email' => $value['email'],
+                'name' => $value->roles->name,
 
             ];
         }
         return response()->json($patients);
-    } 
+    }
 
     public function editar($uuid)
     {
 
         $person = Persons::where('uuid', '=', $uuid)->first();
         $user = User::where('uuid', '=', $person->users->uuid)->first();
-       $rol = Roles::where('uuid', '=', $user->roles->uuid)->first();
+        $rol = Roles::where('uuid', '=', $user->roles->uuid)->first();
         $patients = Patients::where('uuid', '=', $person->patients->uuid)->first();
 
         $masvar = [
@@ -279,14 +321,21 @@ class PatientsController extends Controller
             return new Response($file, 201);
         } else {
             return response()->json('No existe la imagen');
-
         }
     }
-   
-    public function count() {
+
+    public function count()
+    {
         return response()->json($this->patients_respository->count());
     }
-    public function listtratamient() {
+    public function listtratamient()
+    {
         return response()->json($this->patients_respository->list());
+    }
+    public function search($search)
+    {
+        return Patients::whereHas('persons', function ($patient) use ($search) {
+            $patient->where('curp', 'like', '%' . $search . '%');
+        })->with('persons')->get();
     }
 }

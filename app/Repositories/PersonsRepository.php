@@ -40,8 +40,9 @@ class PersonsRepository
         return Persons::where('uuid', '=', $uuid)->first();
     }
 
-    function list() {
-        $persons = User::with('persons','roles')->get();
+    function list()
+    {
+        $persons = User::with('persons', 'roles')->get();
         return $persons->toArray();
     }
 
