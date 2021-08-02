@@ -53,55 +53,57 @@ class DoctorsController extends Controller
 
         ]);
         if ($validator->fails()) {
-            Log::warning('DoctorsController','create','Falta un campo por llenar');
+            Log::warning('DoctorsController', 'create', 'Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
-        if ($request->isMethod('post')) {
-            try {
-                if ($request->file('photo') != null) {
-                    $mime = "";
-                    try {
-                        $mime = $request->file('photo')->getMimeType();
-                    } catch (\Exception$ex) {
-                        return response()->json('No existe la imagen');
-                    }
-                    $name = strtolower($request->file('photo')->getClientOriginalName());
-                    $name = str_replace(' ', '_', $name);
-                    $path = public_path('images');
-                    $request->file('imagen')->move($path, $name);
-                } else {
-                    $name = 'default.jpg';
-                }
-            } catch (\Exception$ext) {
-                return response()->json('No existe la imagen');
-            }
-        }
-        try{
-        $person = $this->persons_repository->create(Uuid::generate()->string, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'), $request->get('curp'), $request->get('cell_phone'),
-            $request->get('telefone'), $name);
 
-        $user = $this->users_repository->create(Uuid::generate()->string, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'), $request->get('email'), Hash::make($request->get('password')),
-            $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2020',
-            $person->id,User::DOCTORS);
+        try {
+            $person = $this->persons_repository->create(
+                Uuid::generate()->string,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('curp'),
+                $request->get('cell_phone'),
+                $request->get('telefone'),
+                'default.jpg'
+            );
 
-        $doctors = $this->doctors_repository->create(Uuid::generate()->string, $request->get('id_card'), $request->get('specialty'),
-            $request->get('sub_especialty'), $request->get('consulting_room'), $request->get('hospitals_id'), $person->id);
+            $user = $this->users_repository->create(
+                Uuid::generate()->string,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('email'),
+                Hash::make($request->get('password')),
+                $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2020',
+                $person->id,
+                User::DOCTORS
+            );
+
+            $doctors = $this->doctors_repository->create(
+                Uuid::generate()->string,
+                $request->get('id_card'),
+                $request->get('specialty'),
+                $request->get('sub_especialty'),
+                $request->get('consulting_room'),
+                $request->get('hospitals_id'),
+                $person->id
+            );
 
 
-        $token = JWTAuth::fromUser($user);
-        $this->sendEmail($user);
-        
-        Log::info('DoctorsController - create - Se creo un nuevo paciente');
-        return response()->json(compact('user', 'token', 'person', 'doctors'), 201);
-    } catch (\Exception $ex) {
-        Log::emergency('DoctorsController','create','Ocurrio un error al intentar crear un nuevo doctor');
-        return response()->json(['error' => $ex->getMessage()]);
+            $token = JWTAuth::fromUser($user);
+            $this->sendEmail($user);
+
+            Log::info('DoctorsController - create - Se creo un nuevo paciente');
+            return response()->json(compact('user', 'token', 'person', 'doctors'), 201);
+        } catch (\Exception $ex) {
+            Log::emergency('DoctorsController', 'create', 'Ocurrio un error al intentar crear un nuevo doctor');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
 
-//agregar id de domicilio
+    //agregar id de domicilio
     public function updated(Request $request, $uuid)
     {
         $validator = Validator::make($request->all(), [
@@ -118,27 +120,45 @@ class DoctorsController extends Controller
 
         ]);
         if ($validator->fails()) {
-            Log::warning('DoctorsController','create','Falta un campo por llenar');
+            Log::warning('DoctorsController', 'create', 'Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
-        try{
-        $user2 = User::where('uuid', '=', $uuid)->first();
+        try {
+            $user2 = User::where('uuid', '=', $uuid)->first();
 
-        $doctors = $this->doctors_repository->create(Uuid::generate()->string, $request->get('id_card'), $request->get('specialty'),
-        $request->get('sub_especialty'), $request->get('consulting_room'), $request->get('hospitals_id'), $person->id);
-      
-        $person = $this->persons_repository->update($user2->persons->uuid, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'), $request->get('curp'), $request->get('cell_phone'),
-            $request->get('telefone'), $request->get('photo'));
+            $doctors = $this->doctors_repository->create(
+                Uuid::generate()->string,
+                $request->get('id_card'),
+                $request->get('specialty'),
+                $request->get('sub_especialty'),
+                $request->get('consulting_room'),
+                $request->get('hospitals_id'),
+                $person->id
+            );
 
-        $user = $this->users_repository->update($user2->uuid, $request->get('name'), $request->get('ap_patern'),
-            $request->get('ap_matern'));
+            $person = $this->persons_repository->update(
+                $user2->persons->uuid,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('curp'),
+                $request->get('cell_phone'),
+                $request->get('telefone'),
+                $request->get('photo')
+            );
 
-        Log::info('DoctorsController - updated - Se actualizo un paciente con el uuid'.$this->hospitals_respository->find($uuid));
-        return response()->json(compact('user', 'person', 'doctors'), 201);
-        } catch(\Exception $ex){
-        Log::emergency('DoctorsController','updated','Ocurrio un error al actualizar un paciente');
-        return response()->json(['error' => $ex->getMessage()]);
+            $user = $this->users_repository->update(
+                $user2->uuid,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern')
+            );
+
+            Log::info('DoctorsController - updated - Se actualizo un paciente con el uuid' . $this->hospitals_respository->find($uuid));
+            return response()->json(compact('user', 'person', 'doctors'), 201);
+        } catch (\Exception $ex) {
+            Log::emergency('DoctorsController', 'updated', 'Ocurrio un error al actualizar un paciente');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
 
@@ -212,47 +232,49 @@ class DoctorsController extends Controller
             return new Response($file, 201);
         } else {
             return response()->json('No existe la imagen');
-
         }
     }
-   public function list() {
+    public function list()
+    {
         $persons = User::where('roles_id', '=', 2)->get();
         $doctors = [];
-        foreach($persons as $key => $value){
+        foreach ($persons as $key => $value) {
             $doctors[$key] = [
-                'id'=>$value['_id'],
-                'uuid'=>$value['uuid'],
-                'doctor'=>$value['name'],
-                'email'=>$value['email'],
-                'name'=>$value->roles->name,
+                'id' => $value['_id'],
+                'uuid' => $value['uuid'],
+                'doctor' => $value['name'],
+                'email' => $value['email'],
+                'name' => $value->roles->name,
 
             ];
         }
         return response()->json($doctors);
-    }    
-    public function DoctorsBloquers(){
+    }
+    public function DoctorsBloquers()
+    {
         $persons = User::where('roles_id', '=', 2)->onlyTrashed()->get();
         $doctors = [];
-        foreach($persons as $key => $value){
+        foreach ($persons as $key => $value) {
             $doctors[$key] = [
-                'id'=>$value['id'],
-                'uuid'=>$value['uuid'],
-                'doctor'=>$value['name'],
-                'email'=>$value['email'],
-                'name'=>$value->roles->name,
+                'id' => $value['id'],
+                'uuid' => $value['uuid'],
+                'doctor' => $value['name'],
+                'email' => $value['email'],
+                'name' => $value->roles->name,
 
             ];
         }
         return response()->json($doctors);
-    }  
-    public function retornarDoctor($uuid){
+    }
+    public function retornarDoctor($uuid)
+    {
         $user = User::withTrashed()->where('uuid', $uuid)->first();
         $user = $user->persons_id;
-       $user_restore = User::withTrashed()->where('persons_id', $user)->restore();
-      $doctors = Doctors::withTrashed()->where('persons_id', $user)->restore();
-      $persons = Persons::withTrashed()->where('_id', $user)->restore();;     
-   
-       return response()->json('Usuario desbloqueado');
+        $user_restore = User::withTrashed()->where('persons_id', $user)->restore();
+        $doctors = Doctors::withTrashed()->where('persons_id', $user)->restore();
+        $persons = Persons::withTrashed()->where('_id', $user)->restore();;
+
+        return response()->json('Usuario desbloqueado');
     }
     public function delete($uuid)
     {
@@ -262,18 +284,19 @@ class DoctorsController extends Controller
         $user->delete();
 
         return response()->json('usuario bloqueado');
-   
     }
-        public function sendEmail($user ){
-            $datas['subject'] = 'HealthWell';
-            $datas['for'] = $user['email'];
-            Mail::send('mail.mail', ['user' => $user], function ($msj) use ($datas) {
-                $msj->from("healthwellapp@gmail.com", "HealthWell");
-                $msj->subject($datas['subject']);
-                $msj->to($datas['for']);
-            });
+    public function sendEmail($user)
+    {
+        $datas['subject'] = 'HealthWell';
+        $datas['for'] = $user['email'];
+        Mail::send('mail.mail', ['user' => $user], function ($msj) use ($datas) {
+            $msj->from("healthwellapp@gmail.com", "HealthWell");
+            $msj->subject($datas['subject']);
+            $msj->to($datas['for']);
+        });
     }
-    public function count(){
+    public function count()
+    {
         return response()->json($this->doctors_repository->count());
     }
 }

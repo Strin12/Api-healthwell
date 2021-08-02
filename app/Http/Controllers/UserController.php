@@ -63,6 +63,8 @@ class UserController extends Controller
         try {
             if ($users != null) {
                 $token = JWTAuth::fromUser($users);
+            } else {
+                return response()->json(['error' => 'Username does not exist'], 404);
             }
         } catch (JWTException $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
@@ -72,6 +74,13 @@ class UserController extends Controller
         if ($users->roles_id == User::PATIENTS) {
             Log::warning('UserController - loginGoogle - Un usuario con rol diferente quiso acceder a la aplicacion' . $users);
             return response()->json(['error' => 'user_does_not_have permissions'], 403);
+        }
+        if ($users->roles_id == User::DOCTORS) {
+            $doctos = $users->persons->doctors;
+        }
+        if ($users->validation != '') {
+            Log::warning('UserController - authenticate - el usuario no fue validado' . $users);
+            return response()->json(['error' => 'User_not_validated'], 403);
         }
         return response()->json(compact('token', 'users'));
     }
@@ -91,6 +100,9 @@ class UserController extends Controller
         }
         $persons = $user->persons;
         $roles = $user->roles;
+        if ($user->roles_id == User::DOCTORS) {
+            $doctos = $user->persons->doctors;
+        }
         return response()->json(compact('user'));
     }
 

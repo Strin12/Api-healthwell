@@ -34,7 +34,7 @@ use App\Http\Middleware\ApiAuthMiddleware;
 
 Route::get('validar', [UserController::class, 'validar']);
 Route::post('login', [UserController::class, 'authenticate']);
-Route::post('token', [UserController::class, 'getAuthenticatedUser']);
+Route::get('token', [UserController::class, 'getAuthenticatedUser']);
 
 Route::post('google', [UserController::class, 'loginGoogle']);
 
@@ -45,9 +45,10 @@ Route::get('hospitals/count', [HospitalsController::class, 'HospitalsCount']);
 Route::get('inquiries/count', [inquiriesController::class, 'count']);
 Route::get('patients/count', [PatientsController::class, 'count']);
 Route::get('doctors/count', [DoctorsController::class, 'count']);
+Route::get('inquiries', [inquiriesController::class, 'list']);
 
 
-///Route::group(['middleware' => ['api.auth']], function() {
+Route::group(['middleware' => ['api.auth']], function() {
 
 Route::post('hospitals', [HospitalsController::class, 'create']);
 Route::put('hospitals/{uuid}', [HospitalsController::class, 'updated']);
@@ -107,7 +108,6 @@ Route::get('domicile/{uuid}', [DomicilieController::class, 'editar']);
 Route::post('inquiries', [inquiriesController::class, 'create']);
 Route::put('inquiries/{uuid}', [inquiriesController::class, 'updated']);
 Route::delete('inquiries/{uuid}', [inquiriesController::class, 'delete']);
-Route::get('inquiries', [inquiriesController::class, 'list']);
 Route::get('inquiries/{uuid}', [inquiriesController::class, 'editar']);
 
 Route::post('recipe', [RecipeController::class, 'create']);
@@ -131,4 +131,4 @@ Route::get('exp/download/{uuid}', [PDFScontroller::class, 'donwloadExpediente'])
 
 
 Route::get('roles', [RolesController::class, 'list']);
-//});
+});

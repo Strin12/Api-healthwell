@@ -30,4 +30,5 @@ class Patients extends Eloquent
     {
         return $this->hasOne(inquiries::class);
     }
+    
 }

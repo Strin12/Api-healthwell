@@ -100,7 +100,7 @@ class PatientsController extends Controller
                     $request->get('ap_patern'),
                     $request->get('ap_matern'),
                     $request->get('email'),
-                    Hash::make($request->get('password')),
+                    Hash::make($request->get('password')). substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
                     $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
                     $person->_id,
                     User::PATIENTS
