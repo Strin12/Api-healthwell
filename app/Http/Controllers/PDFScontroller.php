@@ -31,25 +31,25 @@ class PDFScontroller extends Controller
         $hospital = Hospitals::where('uuid', '=', $doctors->hospitals->uuid)->first();
         $doctors_data = Persons::where('uuid', '=', $doctors->persons->uuid)->first();
         $domicilie = Domicile::where('uuid', '=', $doctors_data->domicilie->uuid)->first();
-        $user = User::where('uuid', '=', $doctors->persons->users->uuid)->first();
+        //$user = User::where('uuid', '=', $doctors->persons->users->uuid)->first();
 
         $masvar = [
-            'id' => $person['id'],
-            'uuid' => $person['uuid'],
-            'doctor' => $user['name'],
-            'cell_phone' => $doctors_data['cell_phone'],
-            'domicilie' => $domicilie['street'] . ' ' . $domicilie['colony'] . ' ' . $domicilie['municipality'] . '' . $domicilie['state'],
-            'specialty' => $doctors['specialty'],
-            'photo' => $hospital['photo'],
-            'patient' => $person['name'] . ' ' . $person['ap_patern'] . ' ' . $person['ap_matern'],
+            //'id' => $person['id'],
+            //'uuid' => $person['uuid'],
+            //'doctor' => $user['name'],
+            //'cell_phone' => $doctors_data['cell_phone'],
+            //'domicilie' => $domicilie['street'] . ' ' . $domicilie['colony'] . ' ' . $domicilie['municipality'] . '' . $domicilie['state'],
+            //'specialty' => $doctors['specialty'],
+            //'photo' => $hospital['photo'],
+            //'patient' => $person['name'] . ' ' . $person['ap_patern'] . ' ' . $person['ap_matern'],
             'prescription' => $recipe['prescription'],
             'start_date' => $recipe['start_date'],
             'ending_date' => $recipe['ending_date'],
             'inquiries_id' => $recipe['inquiries_id'],
-            'age' => $patient['age'],
+          //  'age' => $patient['age'],
         ];
 
-        $pdf = new \FPDF($orientation = 'P', $unit = 'mm', $size = 'letter');
+       /* $pdf = new \FPDF($orientation = 'P', $unit = 'mm', $size = 'letter');
         $pdf->AliasNbPages();
         $pdf->AddPage('L', 'A4', 0);
         $pdf->Image('loguito.png', 10, 8, 33);
@@ -81,7 +81,7 @@ class PDFScontroller extends Controller
         $pdf->Cell(250, 0, 'Fecha Finalizacion :' . '' . $masvar['ending_date'], 0, 1, 'R', false);
 
         $pdf->Line(10, $pdf->getY() + 4, 280, $pdf->getY() + 4);
-        $pdf->Output('I');
+        $pdf->Output('I');*/
     }
     public function downloadReceta($uuid)
     {

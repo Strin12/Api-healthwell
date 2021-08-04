@@ -47,6 +47,9 @@ Route::get('patients/count', [PatientsController::class, 'count']);
 Route::get('doctors/count', [DoctorsController::class, 'count']);
 Route::get('inquiries', [inquiriesController::class, 'list']);
 
+Route::get('recipe/pdf/{uuid}', [PDFScontroller::class, 'receta']);
+Route::post('recipe', [RecipeController::class, 'create']);
+Route::get('users/{uuid}', [UserController::class, 'editar']);
 
 Route::group(['middleware' => ['api.auth']], function() {
 
@@ -58,7 +61,6 @@ Route::get('hospitals/{uuid}', [HospitalsController::class, 'editar']);
 Route::post('hospitals/upload', [HospitalsController::class, 'upload']);
 Route::get('hospitals/upload/{name}', [HospitalsController::class, 'return_image']);
 
-Route::get('users/{uuid}', [UserController::class, 'editar']);
 Route::put('users/{uuid}', [UserController::class, 'updated']);
 Route::delete('users/{uuid}', [UserController::class, 'delete']);
 Route::post('upload', [UserController::class, 'upload']);
@@ -110,12 +112,10 @@ Route::put('inquiries/{uuid}', [inquiriesController::class, 'updated']);
 Route::delete('inquiries/{uuid}', [inquiriesController::class, 'delete']);
 Route::get('inquiries/{uuid}', [inquiriesController::class, 'editar']);
 
-Route::post('recipe', [RecipeController::class, 'create']);
 Route::put('recipe/{uuid}', [RecipeController::class, 'updated']);
 Route::delete('recipe/{uuid}', [RecipeController::class, 'delete']);
 Route::get('recipe', [RecipeController::class, 'list']);
 Route::get('recipe/{uuid}', [RecipeController::class, 'editar']);
-Route::get('recipe/pdf/{uuid}', [PDFScontroller::class, 'receta']);
 Route::get('recipe/download/{uuid}', [PDFScontroller::class, 'downloadReceta']);
 
 Route::post('blood', [BloodPressureController::class, 'create']);

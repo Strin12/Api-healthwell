@@ -208,10 +208,10 @@ class UserController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
         try {
-            $user2 = User::where('uuid', '=', $uuid)->first();
+            $user2 = Persons::where('uuid', '=', $uuid)->first();
 
             $person = $this->persons_repository->update(
-                $user2->persons->uuid,
+                $user2->uuid,
                 $request->get('name'),
                 $request->get('ap_patern'),
                 $request->get('ap_matern'),
@@ -222,15 +222,15 @@ class UserController extends Controller
             );
 
             $user = $this->users_repository->update(
-                $user2->uuid,
+                $user2->users->uuid,
                 $request->get('name'),
                 $request->get('ap_patern'),
                 $request->get('ap_matern')
             );
 
 
-            Log::info('UserController - updated - Se actualizo el usuario con el uuid' . $this->domicile_respository->find($uuid));
-            return response()->json(compact('user', 'person', 'doctors'), 201);
+          Log::info('UserController - updated - Se actualizo el usuario con el uuid'. $user2->uuid);
+            return response()->json(compact('user', 'person'), 201);
         } catch (\Exception $ex) {
             Log::emergency('UserController', 'updated', 'Ocurrio un error al actualizar un usuario');
             return response()->json(['error' => $ex->getMessage()]);
@@ -250,13 +250,13 @@ class UserController extends Controller
     public function editar($uuid)
     {
 
-        $user = User::where('uuid', '=', $uuid)->first();
-        $person = Persons::where('uuid', '=', $user->persons->uuid)->first();
+        $person = Persons::where('uuid', '=', $uuid)->first();
+        $user = User::where('uuid', '=', $person->users->uuid)->first();
         // $doctors = Doctors::where('uuid', '=', $user->persons->doctors->uuid)->first();
 
         $masvar = [
             'id' => $person['id'],
-            'uuid' => $user['uuid'],
+            'uuid' => $person['uuid'],
             'name' => $person['name'],
             'ap_patern' => $person['ap_patern'],
             'ap_matern' => $person['ap_matern'],
@@ -266,8 +266,9 @@ class UserController extends Controller
             'photo' => $person['photo'],
             'roles_id' => $person['roles_id'],
             'email' => $user['email'],
-            'name' => $user['name'],
+            'person' => $user['name'],
             'persons_id' => $user['persons_id'],
+            'rol' => $user->roles['name'],
 
         ];
 

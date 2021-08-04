@@ -168,14 +168,12 @@ class DoctorsController extends Controller
         $person = Persons::where('uuid', '=', $uuid)->first();
         $user = User::where('uuid', '=', $person->users->uuid)->first();
         $rol = Roles::where('uuid', '=', $user->roles->uuid)->first();
-        $doctors = Doctors::where('uuid', '=', $person->doctors->uuid)->firts();
-        // $patients = Patients::where('uuid', '=', $person->patients->uuid)->first();
-        // $inquiries = inquiries::where('uuid', '=', $patients->inquiries->uuid)->first();
+
 
         $masvar = [
             'id' => $person['id'],
-            'uuid' => $user['uuid'],
-            'person' => $person['name'],
+            'uuid' => $person['uuid'],
+            'name' => $person['name'],
             'ap_patern' => $person['ap_patern'],
             'ap_matern' => $person['ap_matern'],
             'curp' => $person['curp'],
@@ -184,14 +182,14 @@ class DoctorsController extends Controller
             'photo' => $person['photo'],
             'roles_id' => $user['roles_id'],
             'email' => $user['email'],
-            'name' => $user['name'],
+            'person' => $user['name'],
             'persons_id' => $user['persons_id'],
-            'id_card' => $doctors['id_card'],
-            'specialty' => $doctors['specialty'],
-            'sub_especialty' => $doctors['sub_especialty'],
-            'consulting_room' => $doctors['consulting_room'],
-            'hospitals_id' => $doctors['hospitals_id'],
-            'persons_id' => $doctors['persons_id'],
+            'id_card' => $person->doctors['id_card'],
+            'specialty' => $person->doctors['specialty'],
+            'sub_especialty' => $person->doctors['sub_especialty'],
+            'consulting_room' => $person->doctors['consulting_room'],
+            'hospitals_id' => $person->doctors['hospitals_id'],
+            'persons_id' => $person->doctors['persons_id'],
 
             'rol' => $rol['name'],
         ];
@@ -213,7 +211,7 @@ class DoctorsController extends Controller
         }
 
         $image_name = time() . $image->getClientOriginalName();
-        \Storage::disk('doctors')->put($image_name, \File::get($image));
+        \Storage::disk('images')->put($image_name, \File::get($image));
         $data = array(
             'code' => 200,
             'imagen' => $image_name,
@@ -225,10 +223,10 @@ class DoctorsController extends Controller
     }
     public function return_image($name)
     {
-        $imagen = \Storage::disk('doctors')->exists($name);
+        $imagen = \Storage::disk('images')->exists($name);
 
         if ($imagen) {
-            $file = \Storage::disk('doctors')->get($name);
+            $file = \Storage::disk('images')->get($name);
             return new Response($file, 201);
         } else {
             return response()->json('No existe la imagen');

@@ -39,10 +39,7 @@ class InquiriesRepository
         return inquiries::where('uuid', '=', $uuid)->first();
     }
 
-    function list() {
-        $persons = inquiries::with('doctors', 'patients')->get();
-        return $persons->toArray();
-    }
+
     public function count(){
         return $patients = DB::table('inquiries')->where('tratamiento', '=', true)->count();
      }

@@ -15,7 +15,7 @@ class inquiries extends Eloquent
     const TRATAMIENTO = true;
 
     protected $fillable = [
-        'uuid', 'num_inquirie', 'tratamiento', 'patients_id', 'doctors_id',
+       '_id', 'uuid', 'num_inquirie', 'tratamiento', 'patients_id', 'doctors_id',
     ];
     protected $hidden = [
         'created_at', 'updated_at', 'deleted_at',

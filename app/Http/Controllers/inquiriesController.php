@@ -21,6 +21,16 @@ class inquiriesController extends Controller
     public function create(Request $request)
     {
         try{
+            $validator = Validator::make($request->all(), [
+                'num_inquirie' => 'required|',
+                'doctors_id' => 'required|',
+                'patients_id' => 'required|',
+
+            ]);
+            if ($validator->fails()) {
+                Log::warning('inquiriesController', 'create', 'Falta un campo por llenar');
+                return response()->json($validator->errors()->toJson(), 400);
+            }
         $uuid = Uuid::generate()->string;
         $num_inquirie = $request->input('num_inquirie');
         $tratamiento = inquiries::TRATAMIENTO;
@@ -59,7 +69,23 @@ class inquiriesController extends Controller
             }
     }
     function list() {
-        return response()->json($this->inquieries_respository->list());
+        $inquiries = inquiries::where('tratamiento', '=', true)->get();
+        $datos = [];
+        foreach ($inquiries as $key => $value) {
+            $datos[$key] = [
+                '_id' => $value['_id'],
+                'uuid' => $value['uuid'],
+                'num_inquirie' => $value['num_inquirie'],
+                'tratamiento' => $value['tratamiento'],
+                'patients_id' => $value['patients_id'],
+                'doctors_id' => $value['doctors_id'],
+                'patients' =>  $value->patients->persons,
+                'doctors' => $value->doctors->persons,
+                'doctor_d' => $value->doctors->persons,
+
+            ];
+        }
+        return response()->json($datos);
     }
 
     public function editar($uuid)
