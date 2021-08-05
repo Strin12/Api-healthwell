@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Uuid;
 use App\Shared\LogManage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class inquiriesController extends Controller
 {
