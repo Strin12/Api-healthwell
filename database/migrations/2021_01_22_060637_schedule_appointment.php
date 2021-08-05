@@ -18,6 +18,7 @@ class ScheduleAppointment extends Migration
             $table->uuid('uuid');
             $table->timestamps('date'); 
             $table->string('turn');
+            $table->string('confirmation');
             $table->integer('patients_id')->unsigned();
             $table->foreign('patients_id')->references('id')->on('patients');
             $table->softDeletes();

@@ -58,4 +58,5 @@ class PatientsRepository
     public function count(){
         return $patients = DB::table('patients')->count();
      }
+ 
 }

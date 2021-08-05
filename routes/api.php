@@ -44,6 +44,7 @@ Route::post('verificar', [PatientsController::class, 'verificar']);
 Route::get('hospitals/count', [HospitalsController::class, 'HospitalsCount']);
 Route::get('inquiries/count', [inquiriesController::class, 'count']);
 Route::get('patients/count', [PatientsController::class, 'count']);
+
 Route::get('doctors/count', [DoctorsController::class, 'count']);
 
 

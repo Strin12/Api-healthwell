@@ -6,6 +6,7 @@ use App\Models\Schedule_appointment;
 use App\Repositories\ScheduleAppointmentRepository;
 use Illuminate\Http\Request;
 use Uuid;
+use Illuminate\Support\Facades\Validator;
 
 use App\Shared\LogManage;
 use Illuminate\Support\Facades\Log;
@@ -22,12 +23,21 @@ class ShuleApointController extends Controller
     public function create(Request $request)
     {
         try{
+            $validator = Validator::make($request->all(), [
+                'date' => 'required|date',
+                'turn' => 'required|',
+            ]);
+            if ($validator->fails()) {
+                Log::warning('ShuleApointController', 'create', 'Falta un campo por llenar');
+                return response()->json($validator->errors()->toJson(), 400);
+            }
         $uuid = Uuid::generate()->string;
         $date = $request->input('date');
         $turn = $request->input('turn');
+        $confirmation = false;
         $patients_id = $request->input('patients_id');
         Log::info('ShuleApointController - create - Se creo una nueva cita');
-        return response()->json($this->shedule_appointment_respository->create($uuid, $date, $turn, $patients_id));
+        return response()->json($this->shedule_appointment_respository->create($uuid, $date, $turn,$confirmation, $patients_id));
         } catch (\Exception $ex) {
         Log::emergency('ShuleApointController','create','Ocurrio un error al crear una nueva cita');
         return response()->json(['error' => $ex->getMessage()]);

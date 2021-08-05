@@ -23,7 +23,6 @@ use Mail;
 use Uuid;
 use App\Shared\LogManage;
 use Illuminate\Support\Facades\Log;
-
 class PatientsController extends Controller
 {
     protected $patients_respository;
@@ -329,6 +328,7 @@ class PatientsController extends Controller
     {
         return response()->json($this->patients_respository->count());
     }
+ 
     public function listtratamient()
     {
         return response()->json($this->patients_respository->list());
