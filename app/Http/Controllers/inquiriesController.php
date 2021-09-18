@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\inquiries;
+use App\Models\Patients;
+
 use App\Repositories\InquiriesRepository;
 use Illuminate\Http\Request;
 use Uuid;
@@ -95,5 +97,18 @@ class inquiriesController extends Controller
     }
     public function count(){
         return response()->json($this->inquieries_respository->count());
+    }
+    public function expedientsCount(){
+
+        $inquiries = inquiries::with('patients')->count();
+        $patients = Patients::with('persons')->count();
+        $colors = ['#6857E6','#009FEE'];
+        $masvar = [
+            'Pacientes' => $inquiries,
+            'Expedientes' => $patients,
+            'colors' => $colors
+            
+        ];
+        return response()->json($masvar);
     }
 }

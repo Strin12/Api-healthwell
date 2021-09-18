@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\inquiries;
 use App\Models\Patients;
 use App\Models\Persons;
 use App\Models\Roles;
@@ -10,7 +9,6 @@ use App\Models\User;
 use App\Repositories\PatientsRepository;
 use App\Repositories\PersonsRepository;
 use App\Repositories\UsersRepository;
-use File;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -19,10 +17,10 @@ use Illuminate\Support\Facades\Validator;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
-use Mail;
 use Uuid;
-use App\Shared\LogManage;
+
 use Illuminate\Support\Facades\Log;
+
 class PatientsController extends Controller
 {
     protected $patients_respository;
@@ -37,93 +35,94 @@ class PatientsController extends Controller
     }
     public function verificar(Request $request)
     {
-        $usr = User::where('email', '=', $request->input('email'))->first();
-
-        if ($usr != null) {
-            $credentials = $request->only('email', 'password');
-            try {
-                if (!$token = JWTAuth::attempt($credentials)) {
-                    return response()->json(['error' => 'invalid_credentials'], 400);
-                }
-            } catch (JWTException $e) {
-                return response()->json(['error' => 'could_not_create_token'], 500);
+        $users = User::where('email', '=', $request->input('email'))->first();
+        try {
+            if ($users != null) {
+                $token = JWTAuth::fromUser($users);
+            } else {
+                return response()->json(['error' => 'Username does not exist'], 404);
             }
-            $users = JWTAuth::user();
-            $persons = $users->persons;
-            $roles = $users->roles;
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'could_not_create_token'], 500);
+        }
+        $persons = $users->persons;
+        $patients = $users->persons->patients;
 
-            if ($users->roles_id == 1 &&  $users->roles_id == 2) {
-                Log::warning('PatientsController - verificar - Un usuario con rol diferente quiso acceder a la aplicacion' . $users);
-                return response()->json('Este usuario no tiene permisos para acceder');
-            }
-            Log::info('UserController - authenticate - Se a inicado sesión' . $users);
+        $roles = $users->roles;
+
+        if ($users->roles_id == User::ADMIN ||  $users->roles_id == User::DOCTORS) {
+            Log::warning('PatientsController - verificar - Un usuario con rol diferente quiso acceder a la aplicacion' . $users);
+            return response()->json(['error' => 'user_does_not_have permissions'], 403);
+        }
+        Log::info('UserController - authenticate - Se a inicado sesión' . $users);
 
 
-            return response()->json(compact('token', 'users'));
-        } else {
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:50',
-                'ap_patern' => 'required|string|max:50',
-                'ap_matern' => 'required|string|max:50',
-                'curp' => 'required|string|unique:persons|max:18',
-                'cell_phone' => 'required|string|max:10',
-                'telefone' => 'required|string|max:10',
-                'email' => 'required|string|unique:users|max:50',
-                'living_place' => 'required|string|max:30',
-                'blood_type' => 'required|string|max:50',
-                'disability' => 'required|string|max:50',
-                'religion' => 'required|string|max:50',
-                'socioeconomic_level' => 'required|string|max:50',
-                'age' => 'required|integer',
+        return response()->json(compact('token', 'users'));
+    }
+    public function create(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:50',
+            'ap_patern' => 'required|string|max:50',
+            'ap_matern' => 'required|string|max:50',
+            'curp' => 'required|string|unique:persons|max:18',
+            'cell_phone' => 'required|string|max:10',
+            'telefone' => 'required|string|max:10',
+            'email' => 'required|string|unique:users|max:50',
+            'living_place' => 'required|string|max:30',
+            'blood_type' => 'required|string|max:50',
+            'disability' => 'required|string|max:50',
+            'religion' => 'required|string|max:50',
+            'socioeconomic_level' => 'required|string|max:50',
+            'age' => 'required|integer',
 
-            ]);
-            if ($validator->fails()) {
-                //     Log::warning('PatientsController','verificar','Falta un campo por llenar');
-                return response()->json($validator->errors()->toJson(), 400);
-            }
-            try {
-                $person = $this->persons_repository->create(
-                    Uuid::generate()->string,
-                    $request->get('name'),
-                    $request->get('ap_patern'),
-                    $request->get('ap_matern'),
-                    $request->get('curp'),
-                    $request->get('cell_phone'),
-                    $request->get('telefone'),
-                    'default.jpg'
-                );
+        ]);
+        if ($validator->fails()) {
+            //     Log::warning('PatientsController','verificar','Falta un campo por llenar');
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+        try {
+            $person = $this->persons_repository->create(
+                Uuid::generate()->string,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('curp'),
+                $request->get('cell_phone'),
+                $request->get('telefone'),
+                'default.jpg'
+            );
 
-                $user = $this->users_repository->create(
-                    Uuid::generate()->string,
-                    $request->get('name'),
-                    $request->get('ap_patern'),
-                    $request->get('ap_matern'),
-                    $request->get('email'),
-                    Hash::make($request->get('password')). substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
-                    $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
-                    $person->_id,
-                    User::PATIENTS
-                );
+            $user = $this->users_repository->create(
+                Uuid::generate()->string,
+                $request->get('name'),
+                $request->get('ap_patern'),
+                $request->get('ap_matern'),
+                $request->get('email'),
+                Hash::make($request->get('password')) . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
+                $request->get('validation') . substr($request->get('name'), 0, 3) . substr($request->get('email'), 0, 3) . '2021',
+                $person->_id,
+                User::PATIENTS
+            );
 
-                $patients = $this->patients_respository->create(
-                    Uuid::generate()->string,
-                    $request->get('living_place'),
-                    $request->get('blood_type'),
-                    $request->get('disability'),
-                    $request->get('religion'),
-                    $request->get('socioeconomic_level'),
-                    $request->get('age'),
-                    $request->get('hospitals_id'),
-                    $person->_id
-                );
+            $patients = $this->patients_respository->create(
+                Uuid::generate()->string,
+                $request->get('living_place'),
+                $request->get('blood_type'),
+                $request->get('disability'),
+                $request->get('religion'),
+                $request->get('socioeconomic_level'),
+                $request->get('age'),
+                $request->get('hospitals_id'),
+                $person->_id
+            );
 
-                $token = JWTAuth::fromUser($user);
+            $token = JWTAuth::fromUser($user);
 
-                return response()->json(compact('user', 'token', 'person', 'patients'), 201);
-            } catch (\Exception $ex) {
-                Log::emergency('PatientsController', 'verificar', 'Ocurrio un error al intentar crear un nuevo paciente');
-                return response()->json(['error' => $ex->getMessage()]);
-            }
+            return response()->json(compact('user', 'token', 'person', 'patients'), 201);
+        } catch (\Exception $ex) {
+            Log::emergency('PatientsController', 'create', 'Ocurrio un error al intentar crear un nuevo paciente');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
 
@@ -328,7 +327,7 @@ class PatientsController extends Controller
     {
         return response()->json($this->patients_respository->count());
     }
- 
+
     public function listtratamient()
     {
         return response()->json($this->patients_respository->list());

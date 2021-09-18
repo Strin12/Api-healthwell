@@ -68,8 +68,20 @@ class ShuleApointController extends Controller
             }
     }
     function list() {
-        return response()->json($this->shedule_appointment_respository->list());
+        $shedule = Schedule_appointment::where('confirmation', '=', true)->get();
+        $datos = [];
+        foreach ($shedule as $key => $value) {
+            $datos[$key] = [
+                'id' => $value['id'],
+            'date' => $value['date'],
+            'turn' => $value['turn'],
+            'patients_id' => $value['patients_id'],
+
+            ];
+        }
+        return response()->json($datos);
     }
+    
 
     public function editar($uuid)
     {

@@ -43,9 +43,12 @@ Route::post('verificar', [PatientsController::class, 'verificar']);
 
 Route::get('hospitals/count', [HospitalsController::class, 'HospitalsCount']);
 Route::get('inquiries/count', [inquiriesController::class, 'count']);
+Route::get('inquiries/expedients', [inquiriesController::class,'expedientsCount']);
+
 Route::get('patients/count', [PatientsController::class, 'count']);
 
 Route::get('doctors/count', [DoctorsController::class, 'count']);
+Route::get('patients/{uuid}', [PatientsController::class, 'editar']);
 
 
 Route::group(['middleware' => ['api.auth']], function() {
@@ -69,7 +72,6 @@ Route::get('users', [UserController::class, 'list']);
 Route::get('patients', [PatientsController::class, 'list']);
 Route::get('patients/tratamient', [PatientsController::class, 'listtratamient']);
 
-Route::get('patients/{uuid}', [PatientsController::class, 'editar']);
 Route::put('patients/{uuid}', [PatientsController::class, 'updated']);
 Route::delete('patients/{uuid}', [PatientsController::class, 'delete']);
 Route::post('patients/upload', [PatientsController::class, 'upload']);
