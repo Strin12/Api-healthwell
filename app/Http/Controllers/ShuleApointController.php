@@ -36,8 +36,9 @@ class ShuleApointController extends Controller
         $turn = $request->input('turn');
         $confirmation = false;
         $patients_id = $request->input('patients_id');
+        $doctors_id = $request->input('doctors_id');
         Log::info('ShuleApointController - create - Se creo una nueva cita');
-        return response()->json($this->shedule_appointment_respository->create($uuid, $date, $turn,$confirmation, $patients_id));
+        return response()->json($this->shedule_appointment_respository->create($uuid, $date, $turn,$confirmation, $patients_id,$doctors_id));
         } catch (\Exception $ex) {
         Log::emergency('ShuleApointController','create','Ocurrio un error al crear una nueva cita');
         return response()->json(['error' => $ex->getMessage()]);
@@ -49,9 +50,8 @@ class ShuleApointController extends Controller
         try{
         $date = $request->input('date');
         $turn = $request->input('turn');
-        $patients_id = $request->input('patients_id');
         Log::info('ShuleApointController - updated - Se actualizo una cita con el uuid'.$this->hospitals_respository->find($uuid));
-        return response()->json($this->shedule_appointment_respository->updated($uuid, $date, $turn, $patients_id));
+        return response()->json($this->shedule_appointment_respository->updated($uuid, $date, $turn));
         } catch(\Exception $ex){
         Log::emergency('ShuleApointController','updated','Ocurrio un error al actualizar la cita');
         return response()->json(['error' => $ex->getMessage()]);

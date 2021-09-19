@@ -12,7 +12,7 @@ class Schedule_appointment extends Eloquent
     protected $collection = 'schedule_appointment';
 
     protected $fillable = [
-        '_id', 'uuid', 'date', 'turn','confirmation', 'patients_id',
+        '_id', 'uuid', 'date', 'turn','confirmation', 'patients_id','doctors_id'
     ];
     protected $hidden = [
         'created_at', 'updated_at', 'deleted_at',

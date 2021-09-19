@@ -280,6 +280,7 @@ class PatientsController extends Controller
             'socioeconomic_level' => $patients['socioeconomic_level'],
             'age' => $patients['age'],
             'hospitals_id' => $patients['hospitals_id'],
+            'patients_id' => $patients['_id'],
             'inquiries_id' => $patients->inquiries->_id,
             'rol' => $rol['name'],
         ];
