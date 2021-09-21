@@ -48,7 +48,6 @@ Route::get('inquiries/expedients', [inquiriesController::class,'expedientsCount'
 Route::get('patients/count', [PatientsController::class, 'count']);
 
 Route::get('doctors/count', [DoctorsController::class, 'count']);
-Route::get('patients/{uuid}', [PatientsController::class, 'editar']);
 
 
 Route::group(['middleware' => ['api.auth']], function() {
@@ -73,6 +72,7 @@ Route::get('patients', [PatientsController::class, 'list']);
 Route::get('patients/tratamient', [PatientsController::class, 'listtratamient']);
 
 Route::put('patients/{uuid}', [PatientsController::class, 'updated']);
+Route::get('patients/{uuid}', [PatientsController::class, 'editar']);
 Route::delete('patients/{uuid}', [PatientsController::class, 'delete']);
 Route::post('patients/upload', [PatientsController::class, 'upload']);
 Route::get('patients/upload/{name}', [PatientsController::class, 'return_image']);

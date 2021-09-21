@@ -121,7 +121,7 @@ class UserController extends Controller
 
         ]);
         if ($validator->fails()) {
-            //    Log::warning('UserController','create','Falta un campo por llenar');
+                Log::warning('UserController','create','Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
         try {
@@ -154,7 +154,7 @@ class UserController extends Controller
             Log::info('UserController - create - Se creo un nuevo usuario');
             return response()->json(compact('user', 'token', 'person'), 201);
         } catch (\Exception $ex) {
-            //  Log::emergency('UserController','create','Ocurrio un error al crear un nuevo usuario');
+          Log::emergency('UserController','create','Ocurrio un error al crear un nuevo usuario');
             return response()->json(['error' => $ex->getMessage()]);
         }
     }
@@ -204,7 +204,7 @@ class UserController extends Controller
 
         ]);
         if ($validator->fails()) {
-            // Log::warning('UserController','updated','Falta un campo por llenar');
+             Log::warning('UserController','updated','Falta un campo por llenar');
             return response()->json($validator->errors()->toJson(), 400);
         }
         try {
@@ -252,7 +252,6 @@ class UserController extends Controller
 
         $person = Persons::where('uuid', '=', $uuid)->first();
         $user = User::where('uuid', '=', $person->users->uuid)->first();
-        // $doctors = Doctors::where('uuid', '=', $user->persons->doctors->uuid)->first();
 
         $masvar = [
             'id' => $person['id'],
