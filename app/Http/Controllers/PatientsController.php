@@ -259,7 +259,7 @@ class PatientsController extends Controller
         $masvar = [
             'id' => $person['id'],
             'uuid' => $user['uuid'],
-            'person' => $person['name'],
+            'name' => $person['name'],
             'ap_patern' => $person['ap_patern'],
             'ap_matern' => $person['ap_matern'],
             'curp' => $person['curp'],
@@ -268,7 +268,7 @@ class PatientsController extends Controller
             'photo' => $person['photo'],
             'roles_id' => $user['roles_id'],
             'email' => $user['email'],
-            'name' => $user['name'],
+            'person' => $user['name'],
             'persons_id' => $user['persons_id'],
             'living_place' => $patients['living_place'],
             'blood_type' => $patients['blood_type'],
