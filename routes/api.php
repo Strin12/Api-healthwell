@@ -92,7 +92,6 @@ Route::get('return/{uuid}', [DoctorsController::class, 'retornarDoctor']);
 
 Route::post('doctors/upload', [DoctorsController::class, 'upload']);
 Route::get('doctors/upload/{name}', [DoctorsController::class, 'return_image']);
-// 
 
 
 Route::post('shedule', [ShuleApointController::class, 'create']);
