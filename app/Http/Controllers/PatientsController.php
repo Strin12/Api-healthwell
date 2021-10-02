@@ -139,7 +139,6 @@ class PatientsController extends Controller
             'living_place' => 'required|string|max:30',
             'blood_type' => 'required|string|max:50',
             'disability' => 'required|string|max:50',
-            'ethnic_group' => 'required|string|max:50',
             'religion' => 'required|string|max:50',
             'socioeconomic_level' => 'required|string|max:50',
             'age' => 'required|integer',
@@ -157,7 +156,6 @@ class PatientsController extends Controller
                 $request->get('living_place'),
                 $request->get('blood_type'),
                 $request->get('disability'),
-                $request->get('ethnic_group'),
                 $request->get('religion'),
                 $request->get('socioeconomic_level'),
                 $request->get('age'),
@@ -182,7 +180,7 @@ class PatientsController extends Controller
                 $request->get('ap_matern')
             );
 
-            Log::info('PatientsController - updated - Se actualizo un paciente con el uuid' . $this->hospitals_respository->find($uuid));
+            Log::info('PatientsController - updated - Se actualizo un paciente con el uuid' . $this->users_repository->find($uuid));
             return response()->json(compact('user', 'person', 'patients'), 201);
         } catch (\Exception $ex) {
             Log::emergency('PatientsController', 'updated', 'Ocurrio un error al actualizar un paciente');
@@ -275,7 +273,6 @@ class PatientsController extends Controller
             'living_place' => $patients['living_place'],
             'blood_type' => $patients['blood_type'],
             'disability' => $patients['disability'],
-            'ethnic_group' => $patients['ethnic_group'],
             'religion' => $patients['religion'],
             'socioeconomic_level' => $patients['socioeconomic_level'],
             'age' => $patients['age'],

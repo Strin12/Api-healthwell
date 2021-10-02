@@ -24,14 +24,13 @@ class PatientsRepository
 
     }
 
-    public function update($uuid, $living_place, $blood_type, $disability, $ethnic_group, $religion, $socioeconomic_level, $age,
+    public function update($uuid, $living_place, $blood_type, $disability, $religion, $socioeconomic_level, $age,
         $hospitals_id) {
 
         $patients = $this->find($uuid);
         $patients->living_place = $living_place;
         $patients->blood_type = $blood_type;
         $patients->disability = $disability;
-        $patients->ethnic_group = $ethnic_group;
         $patients->religion = $religion;
         $patients->socioeconomic_level = $socioeconomic_level;
         $patients->age = $age;
