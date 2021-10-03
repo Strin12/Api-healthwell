@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Uuid;
 
 use App\Shared\LogManage;
+use App\Models\Domicile;
 use Illuminate\Support\Facades\Log;
 
 class DomicilieController extends Controller
@@ -98,9 +99,11 @@ class DomicilieController extends Controller
             return response()->json(['error' => $ex->getMessage()]);
             }
     }
-    function list() {
-        return response()->json($this->domicile_respository->list());
+    public function list($persons_id) {
+        
+        return Domicile::where('persons_id', '=', $persons_id)->first();
     }
+    
 
     public function editar($uuid)
     {
