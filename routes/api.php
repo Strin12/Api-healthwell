@@ -31,7 +31,6 @@ use App\Http\Middleware\ApiAuthMiddleware;
     return $request->user();
 });*/
 
-Route::get('dom/{persons_id}', [DomicilieController::class, 'list']);
 
 Route::get('validar', [UserController::class, 'validar']);
 Route::post('login', [UserController::class, 'authenticate']);
@@ -105,6 +104,7 @@ Route::post('domicile', [DomicilieController::class, 'create']);
 Route::put('domicile/{uuid}', [DomicilieController::class, 'updated']);
 Route::delete('domicile/{uuid}', [DomicilieController::class, 'delete']);
 Route::get('domicile/{uuid}', [DomicilieController::class, 'editar']);
+Route::get('dom/{persons_id}', [DomicilieController::class, 'list']);
 
 Route::post('inquiries', [inquiriesController::class, 'create']);
 Route::put('inquiries/{uuid}', [inquiriesController::class, 'updated']);
