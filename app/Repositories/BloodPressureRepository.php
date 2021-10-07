@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Blood_pressure;
 
-class BloosPressureRepository
+class BloodPressureRepository
 {
     public function create($uuid, $morning, $night, $persons_id)
     {

@@ -5,14 +5,14 @@ namespace App\Models;
 use Jenssegers\Mongodb\Eloquent\Model as Eloquent;
 use Jenssegers\Mongodb\Eloquent\SoftDeletes;
 
-class Bracalets extends Eloquent
+class Bracelet extends Eloquent
 {
     use SoftDeletes;
     protected $connection = "mongodb";
-    protected $collection = 'bracalets';
+    protected $collection = 'Bracelet';
 
     protected $fillable = [
-        '_id', 'blood_oxygenation', 'heart_rate',
+        '_id','uuid', 'blood_oxygenation', 'heart_rate','persons_id'
     ];
     protected $hidden = [
         'created_at', 'updated_at', 'deleted_at',

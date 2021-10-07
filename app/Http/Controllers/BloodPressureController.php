@@ -13,50 +13,52 @@ class BloodPressureController extends Controller
 {
     protected $bloodpressure_respository;
 
-    public function __construct(BloodPressureRepository $repository)
-    {
+
+    public function __construct(BloodPressureRepository $repository){
+
         $this->bloodpressure_respository = $repository;
     }
 
     public function create(Request $request)
     {
-        try{
-        $uuid = Uuid::generate()->string;
-        $morning = $request->input('morning');
-        $night = $request->input('night');
-        $persons_id = $request->input('persons_id');
-        Log::info('BloodPressureController - create - Presion arterial registrada');
-        return response()->json($this->bloodpressure_respository->create($uuid, $morning, $night, $persons_id));
+        try {
+            $uuid = Uuid::generate()->string;
+            $morning = $request->input('morning');
+            $night = $request->input('night');
+            $persons_id = $request->input('persons_id');
+            Log::info('BloodPressureController - create - Presion arterial registrada');
+            return response()->json($this->bloodpressure_respository->create($uuid, $morning, $night, $persons_id));
         } catch (\Exception $ex) {
-        Log::emergency('BloodPressureController','create','Ocurrio un error al intentar registrar la presión arterial');
-        return response()->json(['error' => $ex->getMessage()]);
+            Log::emergency('BloodPressureController', 'create', 'Ocurrio un error al intentar registrar la presión arterial');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
 
     public function updated(Request $request, $uuid)
     {
-        try{
-        $morning = $request->input('morning');
-        $night = $request->input('night');
-        $persons_id = $request->input('persons_id');
-        Log::info('BloodPressureController - updated - Se actualizo la presión arterial con el uuid'.$this->bloodpressure_respository->find($uuid));
-        return response()->json($this->bloodpressure_respository->updated($uuid, $morning, $night, $persons_id));
-        } catch(\Exception $ex){
-        Log::emergency('BloodPressureController','updated','Ocurrio un error al actualizar la presión arterial');
-        return response()->json(['error' => $ex->getMessage()]);
+        try {
+            $morning = $request->input('morning');
+            $night = $request->input('night');
+            $persons_id = $request->input('persons_id');
+            Log::info('BloodPressureController - updated - Se actualizo la presión arterial con el uuid' . $this->bloodpressure_respository->find($uuid));
+            return response()->json($this->bloodpressure_respository->updated($uuid, $morning, $night, $persons_id));
+        } catch (\Exception $ex) {
+            Log::emergency('BloodPressureController', 'updated', 'Ocurrio un error al actualizar la presión arterial');
+            return response()->json(['error' => $ex->getMessage()]);
         }
     }
     public function delete($uuid)
     {
-        try{
+        try {
             Log::info('BloodPressureController - delete - Se ha eliminado la presión arterial');
             return response()->json($this->bloodpressure_respository->delete($uuid));
-        } catch(\Exception $ex){
-            Log::emergency('BloodPressureController','delete','Ocurrio un error al eliminar la presión arterial');
+        } catch (\Exception $ex) {
+            Log::emergency('BloodPressureController', 'delete', 'Ocurrio un error al eliminar la presión arterial');
             return response()->json(['error' => $ex->getMessage()]);
-            }
+        }
     }
-    function list() {
+    function list()
+    {
         return response()->json($this->bloodpressure_respository->list());
     }
 
@@ -71,5 +73,4 @@ class BloodPressureController extends Controller
         ];
         return response()->json($masvar);
     }
-
 }

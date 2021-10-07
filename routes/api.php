@@ -13,6 +13,8 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\ShuleApointController;
 use App\Http\Controllers\DomicilieController;
 use App\Http\Controllers\PDFScontroller;
+use App\Http\Controllers\BloodPressureController;
+use App\Http\Controllers\BraceletController;
 use App\Http\Middleware\ApiAuthMiddleware;
 
 
@@ -30,7 +32,6 @@ use App\Http\Middleware\ApiAuthMiddleware;
 /*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });*/
-Route::get('shedule', [ShuleApointController::class, 'list']);
 
 
 Route::get('validar', [UserController::class, 'validar']);
@@ -96,6 +97,7 @@ Route::get('doctors/upload/{name}', [DoctorsController::class, 'return_image']);
 
 
 Route::post('shedule', [ShuleApointController::class, 'create']);
+Route::get('shedule', [ShuleApointController::class, 'list']);
 Route::put('shedule/{uuid}', [ShuleApointController::class, 'updated']);
 Route::delete('shedule/{uuid}', [ShuleApointController::class, 'delete']);
 Route::get('list/pat', [ShuleApointController::class, 'list_false']);
@@ -126,14 +128,16 @@ Route::get('recipe/download/{uuid}', [PDFScontroller::class, 'downloadReceta']);
 Route::post('blood', [BloodPressureController::class, 'create']);
 Route::put('blood/{uuid}', [BloodPressureController::class, 'updated']);
 Route::delete('blood/{uuid}', [BloodPressureController::class, 'delete']);
-Route::get('blood', [BloodPressureController::class, 'list']);
 Route::get('blood/{uuid}', [BloodPressureController::class, 'editar']);
+Route::get('blood', [BloodPressureController::class, 'list']);
 
 Route::get('diet/pdf', [PDFScontroller::class, 'dieta']);
 Route::get('diet/download/pdf', [PDFScontroller::class, 'downloadieta']);
 Route::get('exp/pdf/{uuid}', [PDFScontroller::class, 'expediente']);
 Route::get('exp/download/{uuid}', [PDFScontroller::class, 'donwloadExpediente']);
 
+Route::post('bracelet', [BraceletController::class, 'create']);
+Route::get('bracelet', [BraceletController::class, 'list']);
 
 Route::get('roles', [RolesController::class, 'list']);
 });
