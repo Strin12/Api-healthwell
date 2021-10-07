@@ -30,6 +30,7 @@ use App\Http\Middleware\ApiAuthMiddleware;
 /*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });*/
+Route::get('shedule', [ShuleApointController::class, 'list']);
 
 
 Route::get('validar', [UserController::class, 'validar']);
@@ -97,7 +98,9 @@ Route::get('doctors/upload/{name}', [DoctorsController::class, 'return_image']);
 Route::post('shedule', [ShuleApointController::class, 'create']);
 Route::put('shedule/{uuid}', [ShuleApointController::class, 'updated']);
 Route::delete('shedule/{uuid}', [ShuleApointController::class, 'delete']);
-Route::get('shedule', [ShuleApointController::class, 'list']);
+Route::get('list/pat', [ShuleApointController::class, 'list_false']);
+Route::delete('shedule/cancel/{uuid}', [ShuleApointController::class, 'cancelShedule']);
+
 Route::get('shedule/{uuid}', [ShuleApointController::class, 'editar']);
 
 Route::post('domicile', [DomicilieController::class, 'create']);

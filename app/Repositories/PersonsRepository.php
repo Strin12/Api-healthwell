@@ -47,10 +47,5 @@ class PersonsRepository
     }
 
 
-    // public function borrados(){
-    //     $person = Persons::with('users')->onlyTrashed()->get();
-
-    //     return $visitante->toArray();
-
-    // }
+ 
 }

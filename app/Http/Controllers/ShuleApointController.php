@@ -81,7 +81,9 @@ class ShuleApointController extends Controller
         }
         return response()->json($datos);
     }
-    
+    public function list_false(){
+        return response()->json($this->shedule_appointment_respository->list());
+    }
 
     public function editar($uuid)
     {
@@ -93,5 +95,18 @@ class ShuleApointController extends Controller
             'patients_id' => $otraVar['patients_id'],
         ];
         return response()->json($masvar);
+    }
+    public function cancelShedule($uuid)
+    {
+        try{
+            $shedule = Schedule_appointment::where('uuid', '=', $uuid)->first();
+            $shedule->confirmation = true;
+            $shedule->save();
+            return response()->json($shedule);
+
+            } catch(\Exception $ex){
+                Log::emergency('ShuleApointController','delete','Ocurrio un error al eliminar una cita');
+                return response()->json(['error' => $ex->getMessage()]);
+            }
     }
 }
