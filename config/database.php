@@ -62,18 +62,10 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        /*'mongodb_conn' => [
+        'mongodb' => [
             'driver' => 'mongodb',
             'dsn' => env('DB_HOST','mongodb+srv://Healthwell:<password>@cluster0.q2l6e.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'),
             'database' => env('DB_DATABASE','healthwell'),
-        ],*/
-        'mongodb' => [
-            'driver' => 'mongodb',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', 27017),
-            'database' => env('DB_DATABASE', 'homestead'),
-            'username' => env('DB_USERNAME', 'homestead'),
-            'password' => env('DB_PASSWORD', 'secret'),
         ],
         'pgsql' => [
             'driver' => 'pgsql',

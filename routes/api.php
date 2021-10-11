@@ -72,6 +72,7 @@ Route::get('users', [UserController::class, 'list']);
 
 Route::get('patients', [PatientsController::class, 'list']);
 Route::get('patients/tratamient', [PatientsController::class, 'listtratamient']);
+Route::post('patients', [PatientsController::class, 'create']);
 
 Route::put('patients/{uuid}', [PatientsController::class, 'updated']);
 Route::get('patients/{uuid}', [PatientsController::class, 'editar']);

@@ -149,7 +149,7 @@ class UserController extends Controller
             );
 
             $token = JWTAuth::fromUser($user);
-            $this->sendEmail($user);
+          //  $this->sendEmail($user);
 
             Log::info('UserController - create - Se creo un nuevo usuario');
             return response()->json(compact('user', 'token', 'person'), 201);

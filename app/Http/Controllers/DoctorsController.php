@@ -93,7 +93,7 @@ class DoctorsController extends Controller
 
 
             $token = JWTAuth::fromUser($user);
-            $this->sendEmail($user);
+         //   $this->sendEmail($user);
 
             Log::info('DoctorsController - create - Se creo un nuevo paciente');
             return response()->json(compact('user', 'token', 'person', 'doctors'), 201);
